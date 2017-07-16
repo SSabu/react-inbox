@@ -2,21 +2,6 @@ import React, { Component } from 'react';
 
 class Toolbar extends Component {
 
-  constructor(props) {
-    super(props);
-
-    this.markRead = this.markRead.bind(this);
-    this.markUnread = this.markUnread.bind(this);
-  }
-
-  markRead(){
-    this.props.toggleRead(true);
-  }
-
-  markUnread(){
-    this.props.toggleRead(false);
-  }
-
   render() {
 
     let box;
@@ -37,15 +22,19 @@ class Toolbar extends Component {
             unread messages
           </p>
 
+          <a className="btn btn-danger" onClick={()=>this.props.addCompose()}>
+            <i className="fa fa-plus"></i>
+          </a>
+
     <button className="btn btn-default">
       <i className={box} onClick={()=>this.props.toggleSelect()} ></i>
     </button>
 
-    <button className="btn btn-default" onClick={this.markRead} disabled={this.props.checkSelected==='none'} >
+    <button className="btn btn-default" onClick={()=>this.props.toggleRead(true)} disabled={this.props.checkSelected==='none'} >
       Mark As Read
     </button>
 
-    <button className="btn btn-default" onClick={this.markUnread} disabled={this.props.checkSelected==='none'}>
+    <button className="btn btn-default" onClick={()=>this.props.toggleRead(false)} disabled={this.props.checkSelected==='none'}>
       Mark As Unread
     </button>
 

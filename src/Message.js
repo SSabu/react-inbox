@@ -6,19 +6,30 @@ class Message extends Component {
   constructor(props) {
     super(props);
 
-    this.toggleSelected = this.toggleSelected.bind(this);
     this.toggleStarred = this.toggleStarred.bind(this);
   }
 
   toggleStarred(){
-    let message = this.props.message;
-    this.props.toggleProperty(message, 'starred');
-  }
 
-  toggleSelected() {
+    let currentStar = !this.props.message.starred;
+
+    let messagesId = [this.props.message.id];
+
     let message = this.props.message;
-    this.props.toggleProperty(message, 'selected' );
-  }
+
+    fetch('http://localhost:8181/api/messages', {
+      headers: {'accept':'application/json', 'content-type':'application/json'},
+      method: 'PATCH',
+      body: JSON.stringify({
+        'messageIds': messagesId,
+        'command':'star',
+        'star':currentStar
+      })
+    })
+    .then( () => {
+      this.props.toggleProperty(message, 'starred');
+  })
+}
 
   render() {
 
@@ -32,7 +43,7 @@ class Message extends Component {
         <div className="col-xs-1">
           <div className="row">
             <div className="col-xs-2">
-              <input type="checkbox" checked={checked} onClick={this.toggleSelected}/>
+              <input type="checkbox" checked={checked} onClick={()=>this.props.toggleProperty(this.props.message, 'selected')}/>
             </div>
             <div className="col-xs-2">
               <i className={star} onClick={this.toggleStarred}></i>
@@ -41,7 +52,7 @@ class Message extends Component {
         </div>
         <div className="col-xs-11">
           { this.props.message.labels.map( (label) => <Label label={label} key={label}/>) }
-            <a href="#">
+            <a href="subject">
               {this.props.message.subject}
             </a>
         </div>

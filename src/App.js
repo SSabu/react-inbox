@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Toolbar from './Toolbar.js'
 import Messages from './Messages.js'
-import messages from './seeds.json';
+import Compose from './Compose.js'
 
 class App extends Component {
 
@@ -9,8 +9,11 @@ class App extends Component {
     super(props)
 
     this.state = {
-      data: messages
+      data: [],
+      composeVisible: false
     }
+
+    this.addCompose = this.addCompose.bind(this);
 
     this.toggleRead = this.toggleRead.bind(this);
 
@@ -30,15 +33,50 @@ class App extends Component {
 
   }
 
+  async getMessages() {
+    const response = await fetch('http://localhost:8181/api/messages');
+    const json = await response.json()
+    return json._embedded.messages
+  }
+
+  async componentDidMount() {
+    const messages = await this.getMessages()
+    this.setState({data:messages});
+  }
+
   deleteMessage() {
+
     this.countUnread();
+
     let newMessages = [];
+    let messagesIds = [];
+
     this.state.data.forEach(msg => {
+
+      if(msg.selected){
+        messagesIds.push(msg.id)
+      }
+
+      if(msg.selected && !msg.read){
+        this.countUnread();
+      }
+
       if(!msg.selected){
         newMessages.push(msg);
       }
     })
-    this.setState({data:newMessages})
+
+    fetch('http://localhost:8181/api/messages', {
+      headers: {'accept':'application/json', 'content-type':'application/json'},
+      method: 'PATCH',
+      body: JSON.stringify({
+        'messageIds': messagesIds,
+        'command':'delete'
+      })
+    })
+    .then(()=> {
+      this.setState({data:newMessages});
+    })
   }
 
   countUnread(){
@@ -52,51 +90,81 @@ class App extends Component {
     e.persist();
 
     let newMessages = [];
+    let messagesIds = [];
 
     this.state.data.forEach(msg => {
       if(msg.selected && msg.labels.length===0 && e.target.value==="Apply label") {
         newMessages.push(msg);
       } else if (msg.selected && msg.labels.indexOf(e.target.value)===-1 && e.target.value !=="Apply label") {
-          newMessages.push(Object.assign({}, msg, {labels: [...msg.labels, e.target.value] }));
-        } else {
+        newMessages.push(Object.assign({}, msg, {labels: [...msg.labels, e.target.value] }));
+        messagesIds.push(msg.id)
+      } else {
         newMessages.push(msg)
       }
     })
-    this.setState({data:newMessages});
+
+    fetch('http://localhost:8181/api/messages', {
+      headers: {'accept':'application/json', 'content-type':'application/json'},
+      method: 'PATCH',
+      body: JSON.stringify({
+        'messageIds': messagesIds,
+        'command':'addLabel',
+        'label':e.target.value
+      })
+    })
+    .then(() => {
+      this.setState({data:newMessages});
+    })
   }
 
   removeLabel(e){
+
     e.preventDefault();
     e.persist();
+
     let newMessages = [];
+    let messagesIds = [];
+
     this.state.data.forEach(msg => {
-      if(msg.selected && msg.labels.length>0) {
+      if (msg.selected && msg.labels.length ===0){
+        newMessages.push(msg);
+      } else if (msg.selected && msg.labels.length>0) {
         if(msg.labels.indexOf(e.target.value)>-1 && e.target.value !=="Remove label") {
           msg.labels.splice(msg.labels.indexOf(e.target.value), 1);
           newMessages.push(Object.assign({}, msg, {labels: [...msg.labels]} ));
+          messagesIds.push(msg.id)
         }
       } else {
         newMessages.push(msg)
       }
     })
-    this.setState({data:newMessages});
+    console.log(newMessages, e.target.value, messagesIds);
+
+    fetch('http://localhost:8181/api/messages', {
+      headers: {'accept':'application/json', 'content-type':'application/json'},
+      method: 'PATCH',
+      body: JSON.stringify({
+        'messageIds': messagesIds,
+        'command':'removeLabel',
+        'label':e.target.value
+      })
+    })
+    .then(() => {
+      this.setState({data:newMessages});
+    })
   }
 
   toggleSelect(){
     let check = this.checkSelected();
     if (check === "all") {
       this.setState((prevState)=>{
-        prevState.data.map(msg => {
-          msg.selected = false;
-        })
+        prevState.data.map(msg => msg.selected = false)
       })
     }
 
     if (check === "none" || check === "some") {
       this.setState((prevState) => {
-        prevState.data.map(msg => {
-          msg.selected = true;
-        })
+        prevState.data.map(msg => msg.selected = true)
       })
     }
   }
@@ -113,19 +181,36 @@ class App extends Component {
   };
 
   toggleRead(condition) {
+
     let newMessage = [];
+    let messagesIds = [];
+
     this.state.data.forEach(msg => {
       if(msg.selected) {
         msg.read = condition;
         newMessage.push(msg);
+        messagesIds.push(msg.id)
       } else {
         newMessage.push(msg);
       }
     })
+
+    fetch('http://localhost:8181/api/messages', {
+      headers: {'accept':'application/json', 'content-type':'application/json'},
+      method: 'PATCH',
+      body: JSON.stringify({
+        'messageIds': messagesIds,
+        'command':'read',
+        'read':condition
+      })
+    })
+    .then(() => {
       this.setState({data:newMessage})
+    })
   };
 
   toggleProperty(mssg, property) {
+
     this.setState((prevState) => {
       const index = prevState.data.indexOf(mssg);
       return {
@@ -137,11 +222,17 @@ class App extends Component {
     })
   };
 
+  addCompose(){
+    this.setState({composeVisible:!this.state.composeVisible});
+  }
+
   render() {
     return (
       <div className="container-fluid">
         <div>
-          <Toolbar toggleRead={this.toggleRead} markUnread={this.markUnread} checkSelected ={this.checkSelected()} toggleSelect={this.toggleSelect} applyLabel={this.applyLabel} removeLabel={this.removeLabel} countUnread={this.countUnread()} deleteMessage={this.deleteMessage}/>
+          <Toolbar toggleRead={this.toggleRead} checkSelected ={this.checkSelected()} toggleSelect={this.toggleSelect} addCompose={this.addCompose} applyLabel={this.applyLabel} removeLabel={this.removeLabel} countUnread={this.countUnread()} deleteMessage={this.deleteMessage}/>
+
+          {this.state.composeVisible  ? <Compose /> : null}
 
           <Messages messages={this.state.data} toggleProperty={this.toggleProperty} />
         </div>
