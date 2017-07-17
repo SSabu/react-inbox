@@ -138,7 +138,6 @@ class App extends Component {
         newMessages.push(msg)
       }
     })
-    console.log(newMessages, e.target.value, messagesIds);
 
     fetch('http://localhost:8181/api/messages', {
       headers: {'accept':'application/json', 'content-type':'application/json'},
