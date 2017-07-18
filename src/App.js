@@ -13,6 +13,8 @@ class App extends Component {
       composeVisible: false
     }
 
+    this.sendMessage = this.sendMessage.bind(this);
+
     this.addCompose = this.addCompose.bind(this);
 
     this.toggleRead = this.toggleRead.bind(this);
@@ -130,7 +132,7 @@ class App extends Component {
         newMessages.push(msg);
       } else if (msg.selected && msg.labels.length>0) {
         if(msg.labels.indexOf(e.target.value)>-1 && e.target.value !=="Remove label") {
-          msg.labels.splice(msg.labels.indexOf(e.target.value), 1);
+          msg.labels.slice(msg.labels.indexOf(e.target.value), 1);
           newMessages.push(Object.assign({}, msg, {labels: [...msg.labels]} ));
           messagesIds.push(msg.id)
         }
@@ -148,7 +150,8 @@ class App extends Component {
         'label':e.target.value
       })
     })
-    .then(() => {
+    .then((response) => {
+      console.log(response);
       this.setState({data:newMessages});
     })
   }
@@ -221,6 +224,31 @@ class App extends Component {
     })
   };
 
+  sendMessage(subject, body){
+
+    let newMessages = [];
+
+    let newMessage = {
+      id: this.state.data.length+1,
+      subject: subject,
+      body: body,
+      starred: false,
+      read: false,
+      labels: []
+    }
+
+    newMessages = [...this.state.data, newMessage];
+
+    fetch('http://localhost:8181/api/messages', {
+      headers: {'accept':'application/json', 'content-type':'application/json'},
+      method: 'POST',
+      body: JSON.stringify({subject: subject, body: body})
+    })
+    .then(() => {
+      this.setState({data:newMessages, composeVisible:false});
+    })
+  }
+
   addCompose(){
     this.setState({composeVisible:!this.state.composeVisible});
   }
@@ -231,7 +259,7 @@ class App extends Component {
         <div>
           <Toolbar toggleRead={this.toggleRead} checkSelected ={this.checkSelected()} toggleSelect={this.toggleSelect} addCompose={this.addCompose} applyLabel={this.applyLabel} removeLabel={this.removeLabel} countUnread={this.countUnread()} deleteMessage={this.deleteMessage}/>
 
-          {this.state.composeVisible  ? <Compose /> : null}
+          {this.state.composeVisible  ? <Compose sendMessage={this.sendMessage} /> : null}
 
           <Messages messages={this.state.data} toggleProperty={this.toggleProperty} />
         </div>
