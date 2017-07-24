@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+import { sendMessage } from '../actions'
+import { bindActionCreators } from 'redux'
 
 class Compose extends Component {
 
@@ -10,8 +13,13 @@ class Compose extends Component {
   sendMessageClick(e){
     e.preventDefault();
     var subject = e.target.subject.value;
-    var body = e.target.subject.value;
-    this.props.sendMessage(subject, body);
+    var body = e.target.body.value;
+    if(subject.length === 0 || body.length === 0) {
+      this.props.history.push('/')
+    } else {
+      this.props.sendMessage(subject, body);
+      this.props.history.push('/')
+    }
   }
 
   render () {
@@ -44,4 +52,19 @@ class Compose extends Component {
   }
 }
 
-export default Compose;
+const mapStateToProps = (state, ownProps) => {
+  const messages = state.messages;
+
+  return {
+    messages
+  }
+}
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  sendMessage
+}, dispatch)
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Compose)
