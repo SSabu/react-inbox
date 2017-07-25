@@ -174,7 +174,6 @@ export function getMessageBody(id) {
   return (dispatch, getState, { Api }) => {
     return Api.fetchMessageBody(id)
       .then(messageBody => {
-        console.log('***',messageBody)
         return dispatch({
           type: GET_BODY,
           messageBody

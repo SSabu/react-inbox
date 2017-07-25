@@ -4,16 +4,12 @@ import { getMessageBody } from '../actions'
 import { bindActionCreators } from 'redux'
 
 class Body extends Component {
-
-  constructor(props){
-    super(props)
-  }
-
   componentDidMount(){
-    this.props.getMessageBody(this.props.id);
+    this.props.getMessageBody(this.props.match.path);
   }
 
   render() {
+
     const { message } = this.props;
     return (
     <div>
@@ -28,10 +24,8 @@ class Body extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-
   return {
     message: state.message,
-    id: ownProps.match.params.id
   }
 }
 

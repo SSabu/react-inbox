@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import Label from './Label.js'
 import Body from './Body.js'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { toggleSelected, toggleStarred } from '../actions'
 import { bindActionCreators } from 'redux'
-
 
 class Message extends Component {
 
@@ -19,7 +18,6 @@ class Message extends Component {
     const star = message.starred ? "star fa fa-star" : "star fa fa-star-o";
 
     return (
-      <Router>
       <div>
       <div className={`row message ${classes} ${select}`}>
         <div className="col-xs-1">
@@ -34,16 +32,15 @@ class Message extends Component {
         </div>
         <div className="col-xs-11">
           { this.props.message.labels.map( (label) => <Label label={label} key={label}/>) }
-          <Link to={`/messages/${message.id}`}>
+          <Link to={`/messages/${message.id}`} >
               {this.props.message.subject}
           </Link>
         </div>
       </div>
       <div>
-        <Route exact path="/messages/:id" component={Body} />
+        <Route exact path={`/messages/${message.id}`} component={Body} />
       </div>
     </div>
-  </Router>
     )
   }
 }

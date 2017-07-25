@@ -1,5 +1,3 @@
-// import { connect } from 'redux'
-
 export default class Api {
   static fetchMessages() {
     return fetch('http://localhost:8181/api/messages')
@@ -28,8 +26,8 @@ export default class Api {
   })
   }
 
-  static fetchMessageBody(id) {
-    return fetch(`http://localhost:8181/api/messages/${id}`)
+  static fetchMessageBody(path) {
+    return fetch(`http://localhost:8181/api/${path}`)
       .then(response => response.json())
       .then(json => json);
   }
