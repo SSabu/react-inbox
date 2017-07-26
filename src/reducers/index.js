@@ -1,6 +1,8 @@
 import { MESSAGES_RECEIVED, TOGGLE_SELECTED, TOGGLE_STARRED, MARK_READ, MARK_UNREAD, APPLY_LABEL, REMOVE_LABEL, TOGGLE_SELECT_ON, TOGGLE_SELECT_OFF, DELETE_MESSAGE, SEND_MESSAGE, GET_BODY } from '../actions'
 
-function messages(state = { messages:[] }, action) {
+const initialState = { messages: [], message: {}}
+
+export function messages(state = initialState , action) {
 
   const { messages, messageId } = action;
 

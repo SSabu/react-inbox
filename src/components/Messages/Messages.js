@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import Message from './Message.js';
+import Message from '../Message/Message.js';
 import { connect } from 'react-redux'
-import { getMessages } from '../actions'
+import { getMessages } from '../../actions'
 import { bindActionCreators } from 'redux'
 
-class Messages extends Component {
+export class Messages extends Component {
 
   componentDidMount(){
     this.props.getMessages();
@@ -19,7 +19,9 @@ class Messages extends Component {
         <div>
             {this.props.messages.map( (message) => <Message
               match={this.props}
-              key={message.id} id = {message.id} labels={message.labels} selected={message.selected} starred={message.starred} read={message.read} subject={message.subject} body={message.body}/>
+              key={message.id}
+              id = {message.id}
+              labels={message.labels} selected={message.selected} starred={message.starred} read={message.read} subject={message.subject} body={message.body}/>
            )}
         </div>
       </div>

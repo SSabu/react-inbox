@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import Label from './Label.js'
-import Body from './Body.js'
+import Label from '../Label.js'
+import Body from '../Body.js'
 import { Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { toggleSelected, toggleStarred } from '../actions'
+import { toggleSelected, toggleStarred } from '../../actions'
 import { bindActionCreators } from 'redux'
 
-class Message extends Component {
+export class Message extends Component {
 
   render() {
 
@@ -32,7 +32,7 @@ class Message extends Component {
         </div>
         <div className="col-xs-11">
           { this.props.message.labels.map( (label) => <Label label={label} key={label}/>) }
-          <Link to={`/messages/${message.id}`} >
+          <Link to={`/messages/${message.id}`}>
               {this.props.message.subject}
           </Link>
         </div>

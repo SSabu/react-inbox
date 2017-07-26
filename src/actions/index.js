@@ -170,9 +170,9 @@ export function sendMessage(subject, body) {
   }
 }
 
-export function getMessageBody(id) {
+export function getMessageBody(path) {
   return (dispatch, getState, { Api }) => {
-    return Api.fetchMessageBody(id)
+    return Api.fetchMessageBody(path)
       .then(messageBody => {
         return dispatch({
           type: GET_BODY,

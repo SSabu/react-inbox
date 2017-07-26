@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Messages should render with props passed in 1`] = `
+<div>
+  <div>
+    <Connect(Message)
+      id={3}
+      labels={
+        Array [
+          "dev",
+        ]
+      }
+      match={
+        Object {
+          "messages": Array [
+            Object {
+              "id": 3,
+              "labels": Array [
+                "dev",
+              ],
+              "read": false,
+              "starred": true,
+              "subject": "Use the 1080p HTTP feed, then you can parse the cross-platform hard drive!",
+            },
+          ],
+        }
+      }
+      read={false}
+      starred={true}
+      subject="Use the 1080p HTTP feed, then you can parse the cross-platform hard drive!"
+    />
+  </div>
+</div>
+`;
+
+exports[`Messages should render without any props defined 1`] = `
+<div>
+  <div />
+</div>
+`;

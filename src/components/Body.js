@@ -1,16 +1,20 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { getMessageBody } from '../actions'
+import { markRead, getMessageBody } from '../actions'
 import { bindActionCreators } from 'redux'
 
 class Body extends Component {
+
   componentDidMount(){
     this.props.getMessageBody(this.props.match.path);
   }
 
   render() {
 
+    // this.props.markRead([this.props.match.path.split('/')[2]]);
+
     const { message } = this.props;
+
     return (
     <div>
       <div className="row message-body">
@@ -30,7 +34,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-  getMessageBody
+  getMessageBody, markRead
 }, dispatch)
 
 export default connect(
